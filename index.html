@@ -24,7 +24,6 @@
             flex-direction: column;
         }
 
-        /* Splash Screen (Açılış Animasyonu) */
         #splash-screen {
             position: fixed;
             top: 0;
@@ -67,7 +66,6 @@
             }
         }
 
-        /* Başlık */
         header {
             background-color: #fff;
             padding: 12px 20px;
@@ -83,7 +81,6 @@
             color: #ff6b6b;
         }
 
-        /* Sohbet Alanı */
         #chat-container {
             flex: 1;
             padding: 15px;
@@ -98,7 +95,7 @@
         }
 
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 12px 16px;
             border-radius: 15px;
             line-height: 1.4;
@@ -122,7 +119,32 @@
             border-bottom-right-radius: 3px;
         }
 
-        /* Sabit Girdi Alanı */
+        /* Seçenek Butonları */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .option-btn {
+            background-color: #fff1f1;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
         .input-area {
             background-color: #fff;
             padding: 12px 15px;
@@ -142,14 +164,13 @@
             border-radius: 25px;
             outline: none;
             font-size: 0.95rem;
-            transition: border-color 0.2s;
         }
 
         input[type="text"]:focus {
             border-color: #ff6b6b;
         }
 
-        button {
+        button#send-btn {
             background-color: #ff6b6b;
             color: white;
             border: none;
@@ -157,34 +178,25 @@
             border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: #fa5252;
         }
     </style>
 </head>
 <body>
 
-    <!-- Açılış Animasyonu -->
     <div id="splash-screen">
         <h1>🍳 Hızlı Yemek Tarifi</h1>
         <p>Lezzetli Tarifler Cebinizde...</p>
     </div>
 
-    <!-- Başlık -->
     <header>
         <h2>Hızlı Yemek Tarifi Asistanı</h2>
     </header>
 
-    <!-- Mesajlaşma Alanı -->
     <div id="chat-container"></div>
 
-    <!-- Mesaj Gönderme Kutusu -->
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Yemek adı yazın..." autocomplete="off">
-        <button id="send-btn">Gönder</button>
+        <input type="text" id="user-input" placeholder="Yemek veya malzeme yazın..." autocomplete="off">
+        <button id="send-btn">Tarif İste</button>
     </div>
 
     <script>
@@ -192,24 +204,46 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
+        // Kapsamlı Tarif Veritabanı
         const tarifler = {
-            "mercimek çorbası": "🥣 **Mercimek Çorbası Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1 adet soğan\n- 1 yemek kaşığı un\n- Sıvı yağ, tuz, karabiber, kimyon, su\n\n**Hazırlanışı:**\n1. Mercimekleri yıkayıp süzün.\n2. Soğanı doğrayıp tencerede kavurun.\n3. Unu ekleyip kavurmaya devam edin.\n4. Baharatları ve suyu ekleyip pişmeye bırakın, ardından blenderdan geçirin.",
+            "mercimek çorbası": "🥣 **Mercimek Çorbası Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1 adet soğan, 1 yemek kaşığı un\n- Sıvı yağ, tuz, baharatlar, su\n\n**Hazırlanışı:**\n1. Mercimekleri yıkayıp süzün.\n2. Soğanı kavurup unu ekleyin.\n3. Su ve mercimekleri ekleyip haşlayın, blenderdan geçirin.",
             
-            "menemen": "🍳 **Menemen Tarifi**\n\n**Malzemeler:**\n- 2 adet domates\n- 2 adet yeşil biber\n- 2 adet yumurta\n- Yağ, tuz, pul biber\n\n**Hazırlanışı:**\n1. Biberleri doğrayıp tavada soteleyin.\n2. Domatesleri ekleyip yumuşayana kadar pişirin.\n3. Yumurtaları kırıp karıştırarak pişirin.",
+            "mercimek köftesi": "🧆 **Mercimek Köftesi Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1.5 su bardağı ince bulgur\n- Soğan, yeşillik, salça, sıvı yağ ve baharatlar\n\n**Hazırlanışı:**\n1. Mercimeği haşlayıp içine bulguru atın ve demlendirin.\n2. Kavrulmuş salçalı soğan ve yeşillikleri ekleyip yoğurun, şekil verin.",
 
-            "makarna": "🍝 **Pratik Domatesli Makarna**\n\n**Malzemeler:**\n- 1 paket makarna\n- 2 adet domates rende\n- Sarımsak, sıvı yağ, tuz\n\n**Hazırlanışı:**\n1. Makarnayı haşlayıp süzün.\n2. Ayrı yerde sosu hazırlayıp makarnayla harmanlayın."
+            "menemen": "🍳 **Menemen Tarifi**\n\n**Malzemeler:**\n- Domates, biber, yumurta, tereyağı, tuz.\n\n**Hazırlanışı:**\n1. Biber ve domatesleri soteleyin, yumurtaları kırıp pişirin.",
+
+            "makarna": "🍝 **Pratik Domatesli Makarna**\n\n**Malzemeler:**\n- Makarna, domates sosu, sarımsak, sıvı yağ.\n\n**Hazırlanışı:**\n1. Makarnayı haşlayıp sosla harmanlayın."
         };
 
-        function addMessage(text, sender) {
+        function addMessage(text, sender, options = null) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
+            
             if (sender === 'bot') {
                 messageDiv.classList.add('bot-message');
                 messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+
+                // Eğer seçenekler varsa ekle
+                if (options && options.length > 0) {
+                    const optContainer = document.createElement('div');
+                    optContainer.classList.add('options-container');
+                    options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.classList.add('option-btn');
+                        btn.textContent = opt;
+                        btn.addEventListener('click', () => {
+                            userInput.value = opt;
+                            handleUserMessage();
+                        });
+                        optContainer.appendChild(btn);
+                    });
+                    messageDiv.appendChild(optContainer);
+                }
             } else {
                 messageDiv.classList.add('user-message');
                 messageDiv.textContent = text;
             }
+            
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -233,28 +267,39 @@
                     addMessage("Merhaba! Hoş geldiniz. Hangi yemek tarifini istersiniz?", 'bot');
                     return;
                 }
-                if (query.includes("nasılsın") || query.includes("nasilsin")) {
-                    addMessage("Teşekkür ederim, iyiyim! Hangi yemek tarifini arıyorsunuz?", 'bot');
+                if (query.includes("nasılsın")) {
+                    addMessage("Teşekkür ederim, iyiyim! Hangi tarifi arıyorsunuz?", 'bot');
                     return;
                 }
-                if (query.includes("teşekkür") || query.includes("tesekkur")) {
+                if (query.includes("teşekkür")) {
                     addMessage("Rica ederim! Afiyet olsun.", 'bot');
                     return;
                 }
 
-                let found = false;
+                // 1. Direkt eşleşme kontrolü
                 for (let key in tarifler) {
-                    if (query.includes(key)) {
+                    if (query === key || query === key + " tarifi") {
                         addMessage(tarifler[key], 'bot');
-                        found = true;
-                        break;
+                        return;
                     }
                 }
 
-                if (!found) {
-                    addMessage("Bu bilgiye cevap veremiyorum, sadece yemek tarifleri konusunda yardımcı olabilirim.", 'bot');
+                // 2. Malzeme bazlı arama (Örn: "mercimek" yazıldığında)
+                let matchedOptions = [];
+                for (let key in tarifler) {
+                    if (key.includes(query)) {
+                        matchedOptions.push(key.charAt(0).toUpperCase() + key.slice(1) + " Tarifi");
+                    }
                 }
-            }, 500);
+
+                if (matchedOptions.length > 0) {
+                    addMessage(`"${query}" ile ilgili şu tarifleri buldum, hangisini istersiniz?`, 'bot', matchedOptions);
+                    return;
+                }
+
+                // 3. Bulunamadı / Kapsam dışı
+                addMessage("Bu bilgiye cevap veremiyorum, sadece yemek tarifleri konusunda yardımcı olabilirim.", 'bot');
+            }, 400);
         }
 
         sendBtn.addEventListener('click', handleUserMessage);
