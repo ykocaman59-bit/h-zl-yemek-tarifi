@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hızlı Yemek Tarifi Asistanı</title>
     <style>
         * {
@@ -12,13 +12,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden;
             background-color: #f7f9fc;
             color: #333;
-            height: 100vh;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         /* Splash Screen (Açılış Animasyonu) */
@@ -60,24 +63,27 @@
             to {
                 opacity: 0;
                 visibility: hidden;
+                pointer-events: none;
             }
         }
 
-        /* Ana Sayfa / Sohbet Arayüzü */
+        /* Başlık */
         header {
             background-color: #fff;
-            padding: 15px 20px;
+            padding: 12px 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         header h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #ff6b6b;
         }
 
+        /* Sohbet Alanı */
         #chat-container {
             flex: 1;
             padding: 15px;
@@ -88,6 +94,7 @@
             max-width: 600px;
             width: 100%;
             margin: 0 auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message {
@@ -115,16 +122,17 @@
             border-bottom-right-radius: 3px;
         }
 
-        /* Girdi Alanı */
+        /* Sabit Girdi Alanı */
         .input-area {
             background-color: #fff;
-            padding: 15px;
+            padding: 12px 15px;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             display: flex;
             gap: 10px;
             max-width: 600px;
             width: 100%;
             margin: 0 auto;
+            flex-shrink: 0;
         }
 
         input[type="text"] {
@@ -159,7 +167,7 @@
 </head>
 <body>
 
-    <!-- Açılış Animasyonu (Splash Screen) -->
+    <!-- Açılış Animasyonu -->
     <div id="splash-screen">
         <h1>🍳 Hızlı Yemek Tarifi</h1>
         <p>Lezzetli Tarifler Cebinizde...</p>
@@ -175,8 +183,8 @@
 
     <!-- Mesaj Gönderme Kutusu -->
     <div class="input-area">
-        <input type="text" id="user-input" placeholder="Yemek adı yazın (Örn: Mercimek Çorbası)..." autocomplete="off">
-        <button id="send-btn">Tarif İste</button>
+        <input type="text" id="user-input" placeholder="Yemek adı yazın..." autocomplete="off">
+        <button id="send-btn">Gönder</button>
     </div>
 
     <script>
@@ -184,16 +192,14 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
-        // Tarif Veritabanı
         const tarifler = {
-            "mercimek çorbası": "🥣 **Mercimek Çorbası Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1 adet soğan\n- 1 yemek kaşığı un\n- Sıvı yağ, tuz, karabiber, kimyon, su\n\n**Hazırlanışı:**\n1. Mercimekleri yıkayıp süzün.\n2. Soğanı yemeklik doğrayıp tencerede sıvı yağda pembeleşene kadar kavurun.\n3. Unu ekleyip kokusu çıkana kadar kavurmaya devam edin.\n4. Mercimekleri, baharatları ve suyu ekleyip mercimekler yumuşayana kadar kaynatın.\n5. Pürüzsüz kıvam için blenderdan geçirin. Sıcak servis yapın.",
+            "mercimek çorbası": "🥣 **Mercimek Çorbası Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1 adet soğan\n- 1 yemek kaşığı un\n- Sıvı yağ, tuz, karabiber, kimyon, su\n\n**Hazırlanışı:**\n1. Mercimekleri yıkayıp süzün.\n2. Soğanı doğrayıp tencerede kavurun.\n3. Unu ekleyip kavurmaya devam edin.\n4. Baharatları ve suyu ekleyip pişmeye bırakın, ardından blenderdan geçirin.",
             
-            "menemen": "🍳 **Menemen Tarifi**\n\n**Malzemeler:**\n- 2 adet domates\n- 2 adet yeşil biber\n- 2 adet yumurta\n- Tereyağı veya sıvı yağ, tuz, pul biber\n\n**Hazırlanışı:**\n1. Biberleri ince ince doğrayıp tavada yağda soteleyin.\n2. Küp doğranmış domatesleri ekleyip yumuşayana kadar pişirin.\n3. Yumurtaları kırın, isteğe göre karıştırarak veya göz göz bırakarak pişirin ve tuz ekleyin.",
+            "menemen": "🍳 **Menemen Tarifi**\n\n**Malzemeler:**\n- 2 adet domates\n- 2 adet yeşil biber\n- 2 adet yumurta\n- Yağ, tuz, pul biber\n\n**Hazırlanışı:**\n1. Biberleri doğrayıp tavada soteleyin.\n2. Domatesleri ekleyip yumuşayana kadar pişirin.\n3. Yumurtaları kırıp karıştırarak pişirin.",
 
-            "makarna": "🍝 **Pratik Domatesli Makarna**\n\n**Malzemeler:**\n- 1 paket makarna\n- 2 adet domates rende\n- 2 diş sarımsak\n- Sıvı yağ veya tereyağı, tuz\n\n**Hazırlanışı:**\n1. Makarnayı tuzlu suda haşlayıp süzün.\n2. Ayrı bir tavada sarımsak ve domates püresini kavurun.\n3. Haşlanan makarnaları sosla buluşturup 2 dakika harmanlayın."
+            "makarna": "🍝 **Pratik Domatesli Makarna**\n\n**Malzemeler:**\n- 1 paket makarna\n- 2 adet domates rende\n- Sarımsak, sıvı yağ, tuz\n\n**Hazırlanışı:**\n1. Makarnayı haşlayıp süzün.\n2. Ayrı yerde sosu hazırlayıp makarnayla harmanlayın."
         };
 
-        // Bot mesajı ekleme fonksiyonu
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
@@ -208,14 +214,12 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Uygulama açıldığında otomatik karşılama mesajı
         window.addEventListener('load', () => {
             setTimeout(() => {
                 addMessage("Hangi yemek tarifini istersiniz?", 'bot');
             }, 2100);
         });
 
-        // Kullanıcı mesajını işleme mantığı
         function handleUserMessage() {
             const text = userInput.value.trim();
             if (!text) return;
@@ -230,11 +234,11 @@
                     return;
                 }
                 if (query.includes("nasılsın") || query.includes("nasilsin")) {
-                    addMessage("Teşekkür ederim, gayet iyiyim! Size hangi yemek tarifinde yardımcı olabilirim?", 'bot');
+                    addMessage("Teşekkür ederim, iyiyim! Hangi yemek tarifini arıyorsunuz?", 'bot');
                     return;
                 }
                 if (query.includes("teşekkür") || query.includes("tesekkur")) {
-                    addMessage("Rica ederim! Afiyet olsun, başka bir tarif ister misiniz?", 'bot');
+                    addMessage("Rica ederim! Afiyet olsun.", 'bot');
                     return;
                 }
 
@@ -262,4 +266,3 @@
     </script>
 </body>
 </html>
-
