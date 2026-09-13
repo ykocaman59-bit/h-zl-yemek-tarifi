@@ -1,0 +1,7 @@
+{
+  "appId": "com.hizliyemek.tarif",
+  "appName": "Hizli Yemek Tarifi",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
+
