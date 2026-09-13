@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hızlı Yemek Tarifi Asistanı</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7f9fc;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Splash Screen (Açılış Animasyonu) */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 999;
+            animation: fadeOut 0.8s ease 2s forwards;
+        }
+
+        #splash-screen h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+
+        #splash-screen p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        /* Ana Sayfa / Sohbet Arayüzü */
+        header {
+            background-color: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h2 {
+            font-size: 1.2rem;
+            color: #ff6b6b;
+        }
+
+        #chat-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background-color: #fff;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .user-message {
+            background-color: #ff6b6b;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
+        }
+
+        /* Girdi Alanı */
+        .input-area {
+            background-color: #fff;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff6b6b;
+        }
+
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #fa5252;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Açılış Animasyonu (Splash Screen) -->
+    <div id="splash-screen">
+        <h1>🍳 Hızlı Yemek Tarifi</h1>
+        <p>Lezzetli Tarifler Cebinizde...</p>
+    </div>
+
+    <!-- Başlık -->
+    <header>
+        <h2>Hızlı Yemek Tarifi Asistanı</h2>
+    </header>
+
+    <!-- Mesajlaşma Alanı -->
+    <div id="chat-container"></div>
+
+    <!-- Mesaj Gönderme Kutusu -->
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Yemek adı yazın (Örn: Mercimek Çorbası)..." autocomplete="off">
+        <button id="send-btn">Tarif İste</button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Tarif Veritabanı
+        const tarifler = {
+            "mercimek çorbası": "🥣 **Mercimek Çorbası Tarifi**\n\n**Malzemeler:**\n- 1 su bardağı kırmızı mercimek\n- 1 adet soğan\n- 1 yemek kaşığı un\n- Sıvı yağ, tuz, karabiber, kimyon, su\n\n**Hazırlanışı:**\n1. Mercimekleri yıkayıp süzün.\n2. Soğanı yemeklik doğrayıp tencerede sıvı yağda pembeleşene kadar kavurun.\n3. Unu ekleyip kokusu çıkana kadar kavurmaya devam edin.\n4. Mercimekleri, baharatları ve suyu ekleyip mercimekler yumuşayana kadar kaynatın.\n5. Pürüzsüz kıvam için blenderdan geçirin. Sıcak servis yapın.",
+            
+            "menemen": "🍳 **Menemen Tarifi**\n\n**Malzemeler:**\n- 2 adet domates\n- 2 adet yeşil biber\n- 2 adet yumurta\n- Tereyağı veya sıvı yağ, tuz, pul biber\n\n**Hazırlanışı:**\n1. Biberleri ince ince doğrayıp tavada yağda soteleyin.\n2. Küp doğranmış domatesleri ekleyip yumuşayana kadar pişirin.\n3. Yumurtaları kırın, isteğe göre karıştırarak veya göz göz bırakarak pişirin ve tuz ekleyin.",
+
+            "makarna": "🍝 **Pratik Domatesli Makarna**\n\n**Malzemeler:**\n- 1 paket makarna\n- 2 adet domates rende\n- 2 diş sarımsak\n- Sıvı yağ veya tereyağı, tuz\n\n**Hazırlanışı:**\n1. Makarnayı tuzlu suda haşlayıp süzün.\n2. Ayrı bir tavada sarımsak ve domates püresini kavurun.\n3. Haşlanan makarnaları sosla buluşturup 2 dakika harmanlayın."
+        };
+
+        // Bot mesajı ekleme fonksiyonu
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            if (sender === 'bot') {
+                messageDiv.classList.add('bot-message');
+                messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            } else {
+                messageDiv.classList.add('user-message');
+                messageDiv.textContent = text;
+            }
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Uygulama açıldığında otomatik karşılama mesajı
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addMessage("Hangi yemek tarifini istersiniz?", 'bot');
+            }, 2100);
+        });
+
+        // Kullanıcı mesajını işleme mantığı
+        function handleUserMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            const query = text.toLowerCase();
+            userInput.value = '';
+
+            setTimeout(() => {
+                if (query.includes("selam") || query.includes("merhaba")) {
+                    addMessage("Merhaba! Hoş geldiniz. Hangi yemek tarifini istersiniz?", 'bot');
+                    return;
+                }
+                if (query.includes("nasılsın") || query.includes("nasilsin")) {
+                    addMessage("Teşekkür ederim, gayet iyiyim! Size hangi yemek tarifinde yardımcı olabilirim?", 'bot');
+                    return;
+                }
+                if (query.includes("teşekkür") || query.includes("tesekkur")) {
+                    addMessage("Rica ederim! Afiyet olsun, başka bir tarif ister misiniz?", 'bot');
+                    return;
+                }
+
+                let found = false;
+                for (let key in tarifler) {
+                    if (query.includes(key)) {
+                        addMessage(tarifler[key], 'bot');
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    addMessage("Bu bilgiye cevap veremiyorum, sadece yemek tarifleri konusunda yardımcı olabilirim.", 'bot');
+                }
+            }, 500);
+        }
+
+        sendBtn.addEventListener('click', handleUserMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+
