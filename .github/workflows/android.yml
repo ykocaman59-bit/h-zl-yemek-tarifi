@@ -1,0 +1,45 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repo'yu Klonla
+      uses: actions/checkout@v3
+
+    - name: Node.js Kurulumu
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Java (JDK 17) Kurulumu
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Bağımlılıkları Yükle
+      run: npm install
+
+    - name: Capacitor Android Platformunu Ekle
+      run: |
+        npx cap init "Hizli Yemek Tarifi" "com.hizliyemek.tarif" --web-dir . || true
+        npx cap add android
+
+    - name: Android Projesini Derle (APK)
+      run: |
+        cd android
+        ./gradlew assembleDebug
+
+    - name: APK Dosyasını Kaydet
+      uses: actions/upload-artifact@v3
+      with:
+        name: yemek-tarifi-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+        
